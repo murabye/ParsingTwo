@@ -3,27 +3,27 @@ using System.Data;
 
 namespace ConsoleApplication53
 {
+    // описание дерева
     class BinTreeNode
     {
-        public BinTreeNode()
-        { }
+        public BinTreeNode() { }                    // бесполезный конструктор
         public BinTreeNode(string rac)
         {
             Info = rac;
             Left = null;
             Right = null;
-        }
-        public string Info { get; set; }
-        public BinTreeNode Left { get; set; }
-        public BinTreeNode Right { get; set; }
+        }           // конструктор из строки
+        public string Info { get; set; }            // операцмя в корне либо значение в крайней ветке 
+        public BinTreeNode Left { get; set; }       // левая ветвь
+        public BinTreeNode Right { get; set; }      // правая ветвь
     }
 
     class Program
     {
-        static char scanSimbol;
+        static char scanSimbol;                        // символ в обработке
         static int sn;
-        static string ExprStr;
-        static bool error = false;
+        static string ExprStr;                         // строка выражения
+        static bool error = false;                     // обнаружена ли ошибка во вводе
 
         static BinTreeNode Expression()
         {
@@ -39,8 +39,7 @@ namespace ConsoleApplication53
                 tree = poow;
             }
             return tree;
-        }
-
+        }             // обработка выражения
         static BinTreeNode Addend()
         {
             BinTreeNode tree = new BinTreeNode();
@@ -55,8 +54,7 @@ namespace ConsoleApplication53
                 tree = poow;
             }
             return tree;
-        }
-
+        }                 // обр-ка слагаемого
         static BinTreeNode Factor()
         {
             BinTreeNode tree = new BinTreeNode();
@@ -81,14 +79,11 @@ namespace ConsoleApplication53
             }
             else Error("Ошибка после арифметического знака");
             return tree;
-        }
-
-
+        }                 // множителя
         static bool Letter()
         {
             return char.IsLetter(scanSimbol);
-        }
-
+        }                        // если буква
         static void Number(BinTreeNode tree)
         {
             while (Digit())
@@ -96,13 +91,11 @@ namespace ConsoleApplication53
                 tree.Info += scanSimbol.ToString();
                 NextSimbol();
             }
-        }
-
+        }        // чтение числа
         static bool Digit()
         {
             return char.IsDigit(scanSimbol);
-        }
-
+        }                         // проверка, является ли чисом
         static void NextSimbol()
         {
             if (sn < ExprStr.Length - 1)
@@ -114,14 +107,12 @@ namespace ConsoleApplication53
             {
                 scanSimbol = '#';
             }
-        }
-
+        }                    // переход к обработке следующего символа
         static void Error(string msg)
         {
             error = true;
             Console.WriteLine(msg);
-        }
-
+        }               // ошибка
         static BinTreeNode Clean(BinTreeNode dl)
         {
             while (string.IsNullOrEmpty(dl.Info) && dl.Right == null)
@@ -144,42 +135,12 @@ namespace ConsoleApplication53
             }
             return dl;
 
-        }
-
-        static int cat(BinTreeNode der)
-        {
-            if (der?.Info == null) return 0;
-            if (der.Info == "-" && der.Right == null) return -cat(der.Right);
-            if ("+-*/".IndexOf(der.Info) >= 0)
-            {
-                switch (der.Info)
-                {
-                    case "+":
-                        {
-                            return cat(der.Left) + cat(der.Right);
-                        }
-                    case "-":
-                        {
-                            return cat(der.Left) - cat(der.Right);
-                        }
-                    case "*":
-                        {
-                            return cat(der.Left) * cat(der.Right);
-                        }
-                    case "/":
-                        {
-                            return cat(der.Left) / cat(der.Right);
-                        }
-                }
-            }
-            return int.Parse(der.Info);
-
-        }
-
-
+        }    // чистка лишних веток
 
         static void Main(string[] args)
         {
+            string ans = "";
+
             Console.WriteLine("Введите строку");
             ExprStr = Console.ReadLine();
             while (ExprStr.IndexOf("  ") >= 0)
@@ -193,29 +154,9 @@ namespace ConsoleApplication53
             if (sn < ExprStr.Length - 1 || scanSimbol != '#')
             {
                 Error("Множитель не распознается");
-            }
-            else
-            {
-                if (error)
-                {
-                    Console.ReadKey(); return;
-                }
+            } else {
+                if (error) { Console.ReadKey(); return; }
                 Console.WriteLine("Хорошая строка");
-                for (int i = 0; i < ExprStr.Length; i++)
-                {
-                    if (char.IsLetter(ExprStr[i]))
-                    {
-                        int rr;
-                        bool ok;
-                        do
-                        {
-                            Console.Write("Введите значение переменной {0} =", ExprStr[i]);
-                            ok = int.TryParse(Console.ReadLine(), out rr);
-                            if (!ok) Console.WriteLine("Неверный ввод");
-                        } while (!ok);
-                        ExprStr = ExprStr.Replace(ExprStr[i].ToString(), rr.ToString());
-                    }
-                }
                 sn = 0;
                 scanSimbol = ExprStr[sn];
                 tree = Expression();
@@ -223,7 +164,7 @@ namespace ConsoleApplication53
                     tree = Clean(tree);
                 try
                 {
-                    Console.WriteLine("Результат " + cat(tree));
+                    Console.WriteLine("Результат " + ans);
                 }
                 catch (DivideByZeroException)
                 {
